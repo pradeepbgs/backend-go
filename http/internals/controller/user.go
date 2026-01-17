@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+
 	"github.com/pradeepbgs/internals/service"
 	"github.com/pradeepbgs/internals/utils"
 )
@@ -25,7 +26,7 @@ func (c *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *UserController) GetUserById(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
+	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		utils.Error(w, http.StatusBadRequest, "Invalid user ID")

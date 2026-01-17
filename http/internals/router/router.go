@@ -17,7 +17,7 @@ func SetupRouter(router  *http.ServeMux) *http.ServeMux {
 	userServ := service.NewUserService(userRepo)
 	userctrl := controller.NewUserController(userServ)
 	router.HandleFunc("/users",userctrl.GetUsers)
-	router.HandleFunc("/user",userctrl.GetUserById)
+	router.HandleFunc("/user/{id}",userctrl.GetUserById)
 	
 	
 	// in the last we return the main router
