@@ -1,13 +1,14 @@
 package service
 
 import (
-	"github.com/pradeepbgs/internals/model"
-	"github.com/pradeepbgs/internals/repository"
+	"github.com/pradeepbgs/internal/model"
+	"github.com/pradeepbgs/internal/repository"
 )
 
 type UserServiceInterface interface {
 	GetUsers() ([]model.User, error)
 	GetUserById(id int) (*model.User, error)
+	CreateUser (name string, email string) (*model.User, error)
 }
 
 type userService struct {
@@ -24,4 +25,12 @@ func (s *userService) GetUsers() ([]model.User, error) {
 
 func (s *userService) GetUserById (id int) (*model.User, error) {
 	return s.repo.FindById(id)
+}
+
+func (s *userService) CreateUser(name string, email string) (*model.User, error) {
+	createdUser, err := s.repo.CreateUser(name,email)
+	if err != nil {
+		return nil,err
+	}
+	return createdUser,nil
 }

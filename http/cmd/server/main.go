@@ -7,8 +7,9 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/pradeepbgs/internals/config"
-	"github.com/pradeepbgs/internals/router"
+	"github.com/pradeepbgs/internal/config"
+	sqlc "github.com/pradeepbgs/internal/db"
+	"github.com/pradeepbgs/internal/router"
 )
 
 func main() {
@@ -18,14 +19,15 @@ func main() {
 	}
 
 	fmt.Println("port==", os.Getenv("PORT"))
-	config := config.Load()
+	conf := config.Load()
 
 	app := http.NewServeMux()
-
+	dbPool := config.NewPostgres(conf.DB_URL)
+	queries := sqlc.New(dbPool)
 	// setup router
-	router.SetupRouter(app)
+	router.SetupRouter(app,queries)
 
 	// run the main server
-	log.Println("Server running on port", config.Port)
-	log.Fatal(http.ListenAndServe(config.Port, app))
+	log.Println("Server running on port", conf.Port)
+	log.Fatal(http.ListenAndServe(conf.Port, app))
 }

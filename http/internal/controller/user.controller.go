@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
-	"github.com/pradeepbgs/internals/service"
-	"github.com/pradeepbgs/internals/utils"
+	"github.com/pradeepbgs/internal/service"
+	"github.com/pradeepbgs/internal/utils"
 )
 
 type UserController struct {
@@ -39,4 +40,34 @@ func (c *UserController) GetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.Json(w, http.StatusOK, user)
+}
+
+type CreateUserRequest struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
+	var req CreateUserRequest
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&req); err != nil {
+		utils.Error(w, http.StatusBadRequest, "Invalid request payloads")
+		return
+	}
+
+	if req.Name == "" || req.Email == "" {
+		utils.Error(w, http.StatusBadRequest, "Name and email are required")
+		return
+	}
+	
+	createdUser, err := c.service.CreateUser(req.Name,req.Email)
+	if err != nil {
+		utils.Error(w, http.StatusBadRequest, "couldn't create the user: "+err.Error())
+		return
+	}
+	
+	utils.Json(w, 200,createdUser)
 }
