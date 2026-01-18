@@ -12,6 +12,7 @@ type UserRepositoryInterface interface {
 	FindAll() ([]model.User, error)
 	FindById(id int) (*model.User, error)
 	CreateUser(name string, email string) (*model.User, error)
+	FindByEmail(email string) (*model.User, error)
 }
 
 type userRepository struct {
@@ -52,12 +53,25 @@ func (r *userRepository) FindById(id int) (*model.User, error) {
 }
 
 func (r *userRepository) CreateUser(name string, email string) (*model.User, error) {
-	 err := r.queries.CreateUser(context.Background(),sqlc.CreateUserParams{Name: name,Email: email})
+	user, err := r.queries.CreateUser(context.Background(), sqlc.CreateUserParams{Name: name, Email: email})
 	if err != nil {
 		return nil, err
 	}
 	return &model.User{
-		Name:  name,
-		Email: email,
+		ID:    int(user.ID),
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
+}
+
+func (r *userRepository) FindByEmail(email string) (*model.User, error) {
+	user, err := r.queries.GetUserByEmail(context.Background(), email)
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		ID:    int(user.ID),
+		Name:  user.Name,
+		Email: user.Email,
 	}, nil
 }
